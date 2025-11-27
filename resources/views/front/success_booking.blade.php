@@ -50,6 +50,10 @@
                 <a href="{{ route('front.transactions') }}"
                     class="w-full rounded-full border border-[#E9E8ED] p-[12px_20px] bg-white text-center font-bold transition-all duration-300 hover:ring-2 hover:ring-[#FF8E62]">Lihat
                     Pemesanan Saya</a>
+                <!-- <a href="{{ route('front.rating', $KelolaPemesanan->trx_id) }}"
+                    class="w-full rounded-full border border-[#FF8E62] p-[12px_20px] bg-white text-center font-bold text-[#FF8E62] transition-all duration-300 hover:bg-[#FF8E62] hover:text-white">
+                    Berikan Rating ⭐
+                </a> -->
             </div>
 
             {{-- Form Testimonial --}}

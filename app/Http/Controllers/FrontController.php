@@ -30,7 +30,7 @@ class FrontController extends Controller
         // Ambil satu bengkel pertama sebagai default (jika belum memilih)
         $Bengkel = Bengkel::first();
 
-       
+
 
         // Kirim data ke view front.index
         return view('front.index', compact('cities', 'services', 'Bengkel'));
@@ -91,10 +91,98 @@ class FrontController extends Controller
     {
         $serviceTypeId = session()->get('serviceTypeId');
         $ServisMobil = ServisMobil::with('variants')->where('id', $serviceTypeId)->first();
+        $reviews = KelolaPemesanan::with('service_details', 'variant_details') // Ambil relasi detail servisnya
+            ->where('bengkel_id', $Bengkel->id)    // Hanya untuk bengkel ini
+            ->whereNotNull('rating')              // Yang sudah ada ratingnya
+            ->orderBy('created_at', 'desc')       // Urutkan dari yang terbaru
+            ->get();
 
-        return view('front.details', compact('Bengkel', 'ServisMobil'));
+        // 2. Hitung rata-rata rating dan total ulasan
+        $averageRating = $reviews->avg('rating');
+        $totalReviews = $reviews->count();
+
+
+        return view('front.details', compact(
+            'Bengkel',
+            'ServisMobil',
+            'reviews',          // <-- Tambahkan ini
+            'averageRating',    // <-- Tambahkan ini
+            'totalReviews'      // <-- Tambahkan ini
+        ));
     }
 
+    // app/Http/Controllers/FrontController.php
+
+    public function rating($trx_id)
+    {
+        $booking = KelolaPemesanan::with(['service_details', 'store_details'])
+            ->where('trx_id', $trx_id)
+            ->firstOrFail();
+
+        // Hanya bisa rating jika sudah dibayar
+        if (!$booking->status_pembayaran) {
+            return redirect()->route('front.transactions')
+                ->withErrors(['error' => 'Booking harus sudah dibayar untuk memberikan rating.']);
+        }
+
+        return view('front.rating', compact('booking'));
+    }
+
+    public function rating_store(Request $request)
+    {
+        $request->validate([
+            'trx_id' => 'required|exists:kelola_pemesanan,trx_id',
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string|max:1000',
+        ]);
+
+        $booking = KelolaPemesanan::where('trx_id', $request->trx_id)->first();
+
+        if (!$booking->status_pembayaran) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Booking harus sudah dibayar untuk memberikan rating.']);
+        }
+
+        $booking->update([
+            'rating' => $request->rating,
+            'komentar' => $request->komentar,
+        ]);
+
+        return redirect()->route('front.rating', $request->trx_id)
+            ->with('success', 'Terima kasih atas rating dan ulasan Anda!');
+    }
+
+    public function rating_edit($trx_id)
+    {
+        $booking = KelolaPemesanan::with(['service_details', 'store_details'])
+            ->where('trx_id', $trx_id)
+            ->firstOrFail();
+
+        return view('front.rating_edit', compact('booking'));
+    }
+
+    // ⬇️ TAMBAHKAN METHOD BARU DI SINI ⬇️
+    public function rating_update(Request $request, $trx_id)
+    {
+        // 1. Validasi data
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string',
+        ]);
+
+        // 2. Cari booking yang ingin di-update
+        $booking = KelolaPemesanan::where('trx_id', $trx_id)->firstOrFail();
+
+        // 3. Update data booking dengan data baru
+        $booking->update([
+            'rating' => $request->rating,
+            'komentar' => $request->komentar,
+        ]);
+
+        // 4. Redirect kembali ke halaman rating dengan pesan sukses
+        return redirect()->route('front.rating', $booking->trx_id)
+            ->with('success', 'Rating Anda berhasil diperbarui.');
+    }
     public function booking(Bengkel $Bengkel)
     {
         session()->put('carStoreId', $Bengkel->id);
@@ -160,7 +248,7 @@ class FrontController extends Controller
         $customerCatatan = session()->get('customerCatatan');
         $serviceTypeId = session()->get('serviceTypeId');
         $carStoreId = session()->get('carStoreId');
-        $variantId = session()->get('variantId'); 
+        $variantId = session()->get('variantId');
 
         $bookingTransactionId = null;
 
@@ -174,7 +262,7 @@ class FrontController extends Controller
             $customerCatatan,
             $serviceTypeId,
             $carStoreId,
-            $variantId, 
+            $variantId,
             &$bookingTransactionId
         ) {
             $validated = $request->validated();
@@ -247,5 +335,17 @@ class FrontController extends Controller
 
         // Tampilkan halaman pencarian transaksi
         return view('front.transactions', compact('Bengkel'));
+    }
+
+    public function invoice($trx_id)
+    {
+        // 1. Ambil data booking/transaksi dari database
+        // Kita ambil juga relasi yang diperlukan (bengkel, servis, variant)
+        $booking = KelolaPemesanan::with(['store_details', 'service_details', 'variant_details'])
+            ->where('trx_id', $trx_id)
+            ->firstOrFail(); // firstOrFail() akan otomatis error 404 jika data tidak ditemukan
+
+        // 2. Tampilkan view 'front.invoice' dan kirim data $booking
+        return view('front.invoice', compact('booking'));
     }
 }

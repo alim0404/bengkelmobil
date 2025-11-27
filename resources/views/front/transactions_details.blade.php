@@ -121,7 +121,7 @@
                     </div>
                     <div class="flex justify-between">
                         <p class="text-sm text-[#270738]">Tanggal Pemesanan</p>
-                        <p class="font-semibold">{{ $details->waktu_mulai->format('d-m-Y') }}</p>
+                        <p class="font-semibold text-right">{{ $details->waktu_mulai->format('d F Y') }}</p>
                     </div>
                 </div>
                 @if($details->catatan)
@@ -146,23 +146,86 @@
                 </div>
             </div>
         </section>
+        <!-- Tambahkan setelah section waktu dan sebelum tombol WhatsApp -->
+        @if($details->status_pembayaran)
+        <section id="Rating-section" class="flex flex-col gap-2 px-8 mt-[18px] relative z-10">
+            @if($details->rating)
+            <!-- Tampilkan rating yang ada -->
+            <div class="w-full rounded-2xl border border-[#E9E8ED] p-4 bg-white">
+                <h3 class="font-semibold mb-3">Rating Anda</h3>
+                <div class="flex items-center gap-2 mb-2">
+                    @for($i = 1; $i <= 5; $i++) <span
+                        class="text-2xl {{ $i <= $details->rating ? 'text-[#FFD700]' : 'text-gray-300' }}">⭐</span>
+                        @endfor
+                        <span class="font-semibold">{{ $details->rating }}/5</span>
+                </div>
+                @if($details->komentar)
+                <div class="bg-gray-50 rounded-xl p-3 mt-3">
+                    <p class="text-sm text-gray-700">{{ $details->komentar }}</p>
+                </div>
+                @endif
+            </div>
+            {{-- KODE BARU YANG SUDAH DIPERBAIKI --}}
+            @else
+            <div class="rounded-2xl border border-[#E9E8ED] p-4 bg-white flex flex-col items-center gap-3">
 
-        <!-- Tombol WhatsApp -->
-        @if (!empty($details->store_details) && !empty($details->store_details->nomer_telepon))
-        @php
-        $phone = preg_replace('/[^0-9]/', '', $details->store_details->nomer_telepon);
-        if (str_starts_with($phone, '0')) {
-        $phone = '62' . substr($phone, 1);
-        }
-        $message = urlencode('Halo, saya ingin menanyakan tentang booking saya.');
-        @endphp
-        <div class="px-8 mt-[30px] flex">
-            <a href="https://wa.me/{{ $phone }}?text={{ $message }}"" target=" _blank"
+                <p class="text-sm text-center">Berikan rating untuk layanan kami!</p>
+
+                <a href="{{ route('front.rating', $details->trx_id) }}"
+                    class="text-center rounded-full py-3 px-4 bg-[#5B86EF] font-bold text-white">
+                    Beri Rating ⭐
+                </a>
+            </div>
+            @endif
+        </section>
+        @endif
+        {{-- (Ini adalah akhir dari section "Rating-section" Anda) --}}
+
+
+
+        <div class="px-8 mt-[30px] pb-6 flex flex-col gap-3">
+
+            {{-- KODE LOGIKA UNTUK TOMBOL CETAK --}}
+            @if($details->status_pembayaran)
+            <p class="text-xs text-center text-gray-700 mb-1">
+                <strong>PENTING: Invoice ini Wajib Dicetak dan Dibawa.</strong>
+                Harap tunjukkan invoice ini untuk verifikasi identitas saat Anda <strong>Mengantar</strong> dan
+                <strong>Mengambil</strong> kendaraan di bengkel.
+            </p>
+            <a href="{{ route('front.invoice', $details->trx_id) }}" target="_blank"
+                {{-- target="_blank" penting agar membuka di tab baru --}}
+                class="w-full rounded-full p-[12px_20px] bg-[#5B86EF] font-bold text-white text-center">
+                Cetak Invoice
+            </a>
+            {{--
+                Catatan: Saya mengganti warna tombol ini menjadi biru (bg-[#5B86EF]) 
+                agar berbeda dari tombol "Hubungi CS" (yang oranye).
+                Jika ingin tetap oranye, ganti saja kembali ke bg-[#FF8E62].
+            --}}
+            @endif
+
+            {{-- Tombol WhatsApp (Kode Anda yang sudah ada) --}}
+            @if (!empty($details->store_details) && !empty($details->store_details->nomer_telepon))
+            @php
+            $phone = preg_replace('/[^0-9]/', '', $details->store_details->nomer_telepon);
+            if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+            }
+            $message = urlencode('Halo, saya ingin menanyakan tentang booking saya.');
+            @endphp
+            <a href="https://wa.me/{{ $phone }}?text={{ $message }}" target="_blank"
                 class="w-full rounded-full p-[12px_20px] bg-[#FF8E62] font-bold text-white text-center">
                 Hubungi Costumer Servis
             </a>
+            @endif
+
+            {{-- Tombol Kembali (Sangat disarankan) --}}
+            <!-- <a href="{{ route('front.transactions') }}"
+                class="w-full rounded-full border border-[#E9E8ED] p-[12px_20px] bg-white text-center font-bold">
+                Kembali
+            </a> -->
+
         </div>
-        @endif
     </main>
 </body>
 

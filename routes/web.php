@@ -35,3 +35,21 @@ Route::get('/booking/{Bengkel}/{ServisMobil}/payment', [FrontController::class, 
 
 Route::get('/booking/success/{KelolaPemesanan}', [FrontController::class, 'success_booking'])
     ->name('front.success.booking');
+
+// routes/web.php
+
+// Rating routes
+Route::get('/rating/{trx_id}', [FrontController::class, 'rating'])
+    ->name('front.rating');
+
+Route::post('/rating', [FrontController::class, 'rating_store'])
+    ->name('front.rating.store');
+
+Route::get('/rating/{trx_id}/edit', [FrontController::class, 'rating_edit'])
+    ->name('front.rating.edit');
+
+Route::put('/rating/{trx_id}/update', [FrontController::class, 'rating_update'])
+    ->name('front.rating.update');
+
+    Route::get('/invoice/{trx_id}', [FrontController::class, 'invoice'])
+    ->name('front.invoice');

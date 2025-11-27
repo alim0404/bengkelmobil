@@ -58,7 +58,7 @@ class KelolaPemesananResource extends Resource
                 Forms\Components\TextInput::make('trx_id')
                     ->label('Transaksi ID')
                     ->required()
-                    ->maxLength(255), 
+                    ->maxLength(255),
 
                 Forms\Components\TextInput::make('nomer_telepon')
                     ->label('Nomer Telepon')
@@ -83,6 +83,24 @@ class KelolaPemesananResource extends Resource
                         1 => 'Sudah Dibayar',
                     ])
                     ->required(),
+                // ✅ Tambahkan Rating
+                Forms\Components\Select::make('rating')
+                    ->label('Rating')
+                    ->options([
+                        1 => '⭐ 1 - Sangat Buruk',
+                        2 => '⭐⭐ 2 - Buruk',
+                        3 => '⭐⭐⭐ 3 - Cukup',
+                        4 => '⭐⭐⭐⭐ 4 - Baik',
+                        5 => '⭐⭐⭐⭐⭐ 5 - Sangat Baik',
+                    ])
+                    ->placeholder('Belum ada rating'),
+
+                // ✅ Tambahkan Komentar
+                Forms\Components\Textarea::make('komentar')
+                    ->label('Komentar Customer')
+                    ->rows(4)
+                    ->columnSpanFull()
+                    ->placeholder('Komentar dari customer tentang layanan'),
 
                 Forms\Components\DatePicker::make('waktu_mulai')
                     ->label('Tanggal Pemesanan')
@@ -119,7 +137,7 @@ class KelolaPemesananResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        
+
             ->columns([
 
                 Tables\Columns\TextColumn::make('nama')
@@ -147,7 +165,32 @@ class KelolaPemesananResource extends Resource
                     ->formatStateUsing(fn($state) => $state ? 'Sudah Dibayar' : 'Belum Dibayar')
                     ->color(fn($state) => $state ? 'success' : 'danger'),
 
-            
+                // ✅ Tambahkan Rating Column
+                Tables\Columns\TextColumn::make('rating')
+                    ->label('Rating')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => $state ? str_repeat('⭐', $state) . " ($state/5)" : 'Belum dinilai')
+                    ->color(fn($state) => match (true) {
+                        $state >= 4 => 'success',
+                        $state >= 3 => 'warning',
+                        $state > 0 => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('komentar')
+                    ->label('Komentar')
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if ($state && strlen($state) > 50) {
+                            return $state;
+                        }
+                        return null;
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+
 
                 Tables\Columns\TextColumn::make('catatan')
                     ->label('Catatan')
@@ -166,6 +209,15 @@ class KelolaPemesananResource extends Resource
             ->filters([
                 //
                 TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('rating')
+                    ->label('Filter Rating')
+                    ->options([
+                        5 => '⭐⭐⭐⭐⭐ 5 Bintang',
+                        4 => '⭐⭐⭐⭐ 4 Bintang',
+                        3 => '⭐⭐⭐ 3 Bintang',
+                        2 => '⭐⭐ 2 Bintang',
+                        1 => '⭐ 1 Bintang',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -179,7 +231,9 @@ class KelolaPemesananResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(null)
+            ->recordAction(null);
     }
 
     public static function getRelations(): array

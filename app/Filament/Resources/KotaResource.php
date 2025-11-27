@@ -66,7 +66,9 @@ class KotaResource extends Resource
                     ForceDeleteBulkAction::make(),               
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+             ->recordUrl(null)
+            ->recordAction(null);
     }
 
     public static function getRelations(): array

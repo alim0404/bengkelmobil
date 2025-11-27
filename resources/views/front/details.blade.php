@@ -6,7 +6,7 @@
 
     {{-- 🔝 Top Navigation --}}
     <div id="Top-nav" class="flex items-center justify-between px-4 pt-5 absolute top-0 z-10 w-full">
-        <a href="{{ url()->previous() }}" class="w-10 h-10 flex shrink-0">
+        <a href="{{route('front.index')}}" class="w-10 h-10 flex shrink-0">
             <img src="{{ asset('assets/images/icons/back.svg') }}" alt="icon">
         </a>
     </div>
@@ -66,11 +66,16 @@
                 <button
                     class="tablink rounded-full border border-[#E9E8ED] p-[8px_16px] font-semibold text-sm bg-white hover:bg-[#5B86EF] hover:text-white"
                     onclick="openPage('contact-tab', this)">Kontak</button>
+                <button
+                    class="tablink rounded-full border border-[#E9E8ED] p-[8px_16px] font-semibold text-sm bg-white hover:bg-[#5B86EF] hover:text-white"
+                    onclick="openPage('reviews-tab', this)">
+                    Ulasan ({{ $totalReviews }})
+                </button>
             </div>
 
             <div class="tabs-contents">
                 {{-- 🧰 About Tab --}}
-                <div id="about-tab" class="tabcontent flex hidden">
+                <div id="about-tab" class="tabcontent flex">
                     <div class="flex flex-col gap-5">
                         <p class="leading-[28px]">{!! $ServisMobil->detail ?? 'Detail tidak tersedia.' !!}</p>
 
@@ -101,16 +106,14 @@
                                         </div>
 
                                     </div>
-                                    <!-- <button class="appearance-none font-semibold text-sm text-[#FF8E62] hover:underline"
-                                        data-modal-target="default-modal" data-modal-toggle="default-modal"
-                                        type="button">Detail Servis</button> -->
                                 </div>
 
                                 {{-- 🔸 Variants --}}
                                 @if(optional($ServisMobil)->hasVariants())
                                 <div class="flex flex-col gap-2 mt-4">
                                     <h3 class="font-semibold">Pilihan Variant:</h3>
-                                    <p class="text-sm text-[#909DBF] mb-2">Servis ini memiliki beberapa pilihan variant.
+                                    <p class="text-sm text-[#909DBF] mb-2">Servis ini memiliki beberapa pilihan
+                                        variant.
                                         Harga akan ditampilkan setelah Anda memilih variant saat pemesanan.</p>
                                     <div class="flex flex-col gap-2">
                                         @foreach($ServisMobil->variants as $variant)
@@ -118,7 +121,6 @@
                                             <div>
                                                 <p class="font-medium">{{ $variant->nama }}</p>
                                                 @if($variant->deskripsi)
-                                                <!-- <p class="text-sm text-gray-600 mt-1">{{ $variant->deskripsi }}</p> -->
                                                 @endif
                                             </div>
                                             <p class="font-semibold text-[#FF8E62]">Rp
@@ -175,6 +177,86 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {{-- ⭐️ Reviews Tab --}}
+                <div id="reviews-tab" class="tabcontent flex hidden">
+                    <div class="flex flex-col gap-5 w-full">
+
+                        @if($totalReviews > 0)
+                        {{-- Ringkasan Rating --}}
+                        <div class="rounded-2xl border border-[#E9E8ED] p-4 bg-white">
+                            <div class="flex items-center gap-3">
+                                <div class="text-3xl">
+                                    <span class="text-[#FFD700]">⭐</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <p class="font-bold text-lg">
+                                        {{-- Tampilkan rata-rata, format 1 angka desimal --}}
+                                        {{ number_format($averageRating, 1) }}
+                                        <span class="font-normal text-base text-[#909DBF]">/ 5.0</span>
+                                    </p>
+                                    <p class="text-sm text-[#909DBF]">
+                                        Dari {{ $totalReviews }} Ulasan
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Daftar Ulasan --}}
+                        <div class="flex flex-col gap-4">
+                            @foreach($reviews as $review)
+                            <div class="rounded-2xl border border-[#E9E8ED] p-4 bg-white flex flex-col gap-3">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex flex-col gap-1">
+                                        {{-- Nama pelanggan dari data booking --}}
+                                        <p class="font-semibold">{{ $review->nama }}</Sectio>
+                                        </p>
+                                        <p class="text-xs text-[#909DBF]">
+                                            Layanan:
+                                            {{-- Cek apakah ulasan ini memiliki data variant --}}
+                                            @if($review->variant_details)
+                                            {{-- Jika YA, tampilkan nama servis & nama variant --}}
+                                            {{ $review->service_details->nama ?? 'Layanan' }} -
+                                            <strong>{{ $review->variant_details->nama ?? 'Variant' }}</strong>
+                                            @else
+                                            {{-- Jika TIDAK, tampilkan nama servis saja --}}
+                                            {{ $review->service_details->nama ?? 'Layanan' }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-1 text-[#FFD700]">
+                                        {{-- Rating yg diberikan --}}
+                                        <p class="font-bold text-sm">{{ number_format($review->rating, 1) }}</p>
+                                        <span class="text-lg">⭐</span>
+                                    </div>
+                                </div>
+
+                                {{-- Tampilkan komentar jika ada --}}
+                                @if($review->komentar)
+                                <p class="text-sm text-gray-700 leading-relaxed italic">
+                                    "{{ $review->komentar }}"
+                                </p>
+                                @endif
+
+                                {{-- Tampilkan waktu ulasan dibuat --}}
+                                <p class="text-xs text-gray-400 text-right">
+                                    {{ $review->created_at->diffForHumans() }}
+                                </p>
+                            </div>
+                            @endforeach
+                        </div>
+
+                        @else
+                        {{-- Tampilan jika tidak ada ulasan --}}
+                        <div class="rounded-2xl border border-[#E9E8ED] p-6 bg-white text-center">
+                            <p class="text-base text-gray-500">
+                                Belum ada ulasan untuk bengkel ini.
+                            </p>
+                        </div>
+                        @endif
+
                     </div>
                 </div>
             </div>
@@ -245,4 +327,41 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 <script src="{{ asset('customjs/details.js') }}"></script>
+
+<script>
+    function openPage(pageName, elmnt) {
+        // Sembunyikan semua elemen dengan class="tabcontent"
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.add("hidden");
+        }
+
+        // Hapus style aktif dari semua tombol tab
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("bg-[#5B86EF]", "text-white");
+            tablinks[i].classList.add("bg-white"); // Pastikan kembali ke style non-aktif
+        }
+
+        // Tampilkan tab yang diklik
+        document.getElementById(pageName).classList.remove("hidden");
+
+        // Tambahkan style aktif ke tombol yang diklik
+        elmnt.classList.add("bg-[#5B86EF]", "text-white");
+        elmnt.classList.remove("bg-white");
+    }
+
+    // Ambil elemen dengan id="defaultOpen" dan klik
+    // untuk memastikan tab default terbuka saat halaman dimuat
+    // (Meskipun kita sudah menghapus 'hidden', ini untuk jaga-jaga
+    // jika JS kamu memuat setelahnya dan menyembunyikan semuanya lagi)
+    document.addEventListener("DOMContentLoaded", function(event) {
+        var defaultOpenButton = document.getElementById("defaultOpen");
+        if (defaultOpenButton) {
+            // Kita tidak perlu 'click()' karena HTML-nya sudah benar
+            // Biarkan state HTML awal yang menanganinya.
+        }
+    });
+</script>
 @endpush

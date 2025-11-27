@@ -29,11 +29,13 @@ class KelolaPemesanan extends Model
         'bukti',
         'total_bayar',
         'status_pembayaran',
+        'rating',
+        'komentar',
         'waktu_mulai',
         'jam_mulai',
         'catatan',
         'servis_mobil_id',
-        'servis_variant_id', 
+        'servis_variant_id',
         'bengkel_id',
     ];
 
@@ -61,7 +63,7 @@ class KelolaPemesanan extends Model
         return $this->belongsTo(Bengkel::class, 'bengkel_id');
     }
 
-     // Tambahkan relasi variant
+    // Tambahkan relasi variant
     public function variant_details(): BelongsTo
     {
         return $this->belongsTo(ServisVariant::class, 'servis_variant_id');
