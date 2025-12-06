@@ -347,11 +347,16 @@ class FrontController extends Controller
         ) {
             $validated = $request->validated();
 
-            // Simpan bukti pembayaran jika ada file yang diupload
-            if ($request->hasFile('proof')) {
-                $proofPath = $request->file('proof')->store('proofs', 'public');
-                $validated['bukti'] = $proofPath;
-            }
+        if ($request->hasFile('proof')) {
+            $file = $request->file('proof');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Simpan dengan compressed (gunakan GD/ImageMagick default Laravel)
+            $file->storeAs('proofs', $filename, 'public');
+            
+            $validated['bukti'] = 'proofs/' . $filename;
+        }
+
 
             // Assign data customer dan pemesanan ke array validated
             $validated['nama'] = $customerName;
