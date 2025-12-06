@@ -32,7 +32,7 @@
             </div>
         </div>
         <section id="Services" class="flex flex-col gap-3 px-4">
-            <h1 class="font-semibold text-white">Layanan Perawatan Mobil KOta Parepare</h1>
+            <h1 class="font-semibold text-white">Layanan Perawatan Mobil Kota Parepare</h1>
             <div class="grid grid-cols-3 gap-4">
 
                 @forelse ($services as $service)
@@ -110,15 +110,15 @@
 @endsection
 @push('before-scripts')
 <script>
-    document.querySelectorAll('.service-link').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const cityId = document.getElementById('city_id').value;
-            const serviceTypeId = this.getAttribute('data-service');
+document.querySelectorAll('.service-link').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const cityId = document.getElementById('city_id').value;
+        const serviceTypeId = this.getAttribute('data-service');
 
-            // Redirect to a route with parameters
-            window.location.href = `/go-to-store?city_id=${cityId}&service_type=${serviceTypeId}`;
-        });
+        // Redirect to a route with parameters
+        window.location.href = `/go-to-store?city_id=${cityId}&service_type=${serviceTypeId}`;
     });
+});
 </script>
 @endpush
