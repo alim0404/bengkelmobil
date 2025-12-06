@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Filament\Resources;
-
 use App\Filament\Resources\KelolaPemesananResource\Pages;
 use App\Filament\Resources\KelolaPemesananResource\RelationManagers;
 use App\Models\KelolaPemesanan;
@@ -14,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\ForceDeleteBulkAction; // ✅ Perbaiki ini
+use Filament\Tables\Actions\ForceDeleteBulkAction; 
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 
@@ -24,22 +23,18 @@ class KelolaPemesananResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
-
-
-    // Animasi berkedip untuk badge
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where('status_pembayaran', false)->count();
     }
 
-    // ✅ Warna badge merah jika ada pemesanan belum dibayar
     public static function getNavigationBadgeColor(): ?string
     {
         $count = static::getModel()::where('status_pembayaran', false)->count();
         return $count > 0 ? 'danger' : 'success';
     }
 
-    // ✅ Tooltip untuk badge
+   
     public static function getNavigationBadgeTooltip(): ?string
     {
         $count = static::getModel()::where('status_pembayaran', false)->count();
@@ -154,7 +149,6 @@ class KelolaPemesananResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-
                 Tables\Columns\TextColumn::make('total_bayar')
                     ->label('Total Bayar')
                     ->money('IDR', true),
@@ -165,7 +159,6 @@ class KelolaPemesananResource extends Resource
                     ->formatStateUsing(fn($state) => $state ? 'Sudah Dibayar' : 'Belum Dibayar')
                     ->color(fn($state) => $state ? 'success' : 'danger'),
 
-                // ✅ Tambahkan Rating Column
                 Tables\Columns\TextColumn::make('rating')
                     ->label('Rating')
                     ->badge()
@@ -190,8 +183,6 @@ class KelolaPemesananResource extends Resource
                     })
                     ->toggleable(isToggledHiddenByDefault: false),
 
-
-
                 Tables\Columns\TextColumn::make('catatan')
                     ->label('Catatan')
                     ->limit(50)
@@ -203,7 +194,6 @@ class KelolaPemesananResource extends Resource
                         return null;
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-
 
             ])
             ->filters([
