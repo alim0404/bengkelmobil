@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Filament\Resources;
+
 use App\Filament\Resources\KelolaPemesananResource\Pages;
 use App\Filament\Resources\KelolaPemesananResource\RelationManagers;
 use App\Models\KelolaPemesanan;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\ForceDeleteBulkAction; 
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 
@@ -34,7 +35,7 @@ class KelolaPemesananResource extends Resource
         return $count > 0 ? 'danger' : 'success';
     }
 
-   
+
     public static function getNavigationBadgeTooltip(): ?string
     {
         $count = static::getModel()::where('status_pembayaran', false)->count();
@@ -63,7 +64,12 @@ class KelolaPemesananResource extends Resource
                 Forms\Components\FileUpload::make('bukti')
                     ->label('Bukti Pembayaran')
                     ->image()
-                    ->required(),
+                    ->imageResizeMode('cover')
+                    ->imageCropAspectRatio('16:9')  // Optional
+                    ->directory('proofs')            // 👈 Simpan ke public/proofs
+                    ->disk('public')                 // 👈 Gunakan public disk
+                    ->required()
+                    ->visibility('public'),
 
                 Forms\Components\TextInput::make('total_bayar')
                     ->label('Total Bayar (Rp)')
