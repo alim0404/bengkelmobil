@@ -67,7 +67,7 @@ class KelolaPemesananResource extends Resource
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('16:9')  // Optional
                     ->directory('proofs')            // 👈 Simpan ke public/proofs
-                    ->disk('public')                 // 👈 Gunakan public disk
+                    ->disk('public_direct')                  // 👈 Gunakan public disk
                     ->required()
                     ->visibility('public'),
 
