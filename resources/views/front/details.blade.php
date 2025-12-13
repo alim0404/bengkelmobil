@@ -120,8 +120,8 @@
                                         <div class="p-3 bg-gray-50 rounded-lg flex justify-between">
                                             <div>
                                                 <p class="font-medium">{{ $variant->nama }}</p>
-                                                <p class="font-medium">{{ $variant->deskripsi }}</p>
-
+                                                @if($variant->deskripsi)
+                                                @endif
                                             </div>
                                             <p class="font-semibold text-[#FF8E62]">Rp
                                                 {{ number_format($variant->harga, 0, ',', '.') }}
