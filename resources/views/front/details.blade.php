@@ -120,8 +120,8 @@
                                         <div class="p-3 bg-gray-50 rounded-lg flex justify-between">
                                             <div>
                                                 <p class="font-medium">{{ $variant->nama }}</p>
-                                                @if($variant->deskripsi)
-                                                @endif
+                                                <p class="font-medium">{{ $variant->deskripsi }}</p>
+
                                             </div>
                                             <p class="font-semibold text-[#FF8E62]">Rp
                                                 {{ number_format($variant->harga, 0, ',', '.') }}
@@ -329,39 +329,39 @@
 <script src="{{ asset('customjs/details.js') }}"></script>
 
 <script>
-    function openPage(pageName, elmnt) {
-        // Sembunyikan semua elemen dengan class="tabcontent"
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].classList.add("hidden");
-        }
-
-        // Hapus style aktif dari semua tombol tab
-        tablinks = document.getElementsByClassName("tablink");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("bg-[#5B86EF]", "text-white");
-            tablinks[i].classList.add("bg-white"); // Pastikan kembali ke style non-aktif
-        }
-
-        // Tampilkan tab yang diklik
-        document.getElementById(pageName).classList.remove("hidden");
-
-        // Tambahkan style aktif ke tombol yang diklik
-        elmnt.classList.add("bg-[#5B86EF]", "text-white");
-        elmnt.classList.remove("bg-white");
+function openPage(pageName, elmnt) {
+    // Sembunyikan semua elemen dengan class="tabcontent"
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.add("hidden");
     }
 
-    // Ambil elemen dengan id="defaultOpen" dan klik
-    // untuk memastikan tab default terbuka saat halaman dimuat
-    // (Meskipun kita sudah menghapus 'hidden', ini untuk jaga-jaga
-    // jika JS kamu memuat setelahnya dan menyembunyikan semuanya lagi)
-    document.addEventListener("DOMContentLoaded", function(event) {
-        var defaultOpenButton = document.getElementById("defaultOpen");
-        if (defaultOpenButton) {
-            // Kita tidak perlu 'click()' karena HTML-nya sudah benar
-            // Biarkan state HTML awal yang menanganinya.
-        }
-    });
+    // Hapus style aktif dari semua tombol tab
+    tablinks = document.getElementsByClassName("tablink");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("bg-[#5B86EF]", "text-white");
+        tablinks[i].classList.add("bg-white"); // Pastikan kembali ke style non-aktif
+    }
+
+    // Tampilkan tab yang diklik
+    document.getElementById(pageName).classList.remove("hidden");
+
+    // Tambahkan style aktif ke tombol yang diklik
+    elmnt.classList.add("bg-[#5B86EF]", "text-white");
+    elmnt.classList.remove("bg-white");
+}
+
+// Ambil elemen dengan id="defaultOpen" dan klik
+// untuk memastikan tab default terbuka saat halaman dimuat
+// (Meskipun kita sudah menghapus 'hidden', ini untuk jaga-jaga
+// jika JS kamu memuat setelahnya dan menyembunyikan semuanya lagi)
+document.addEventListener("DOMContentLoaded", function(event) {
+    var defaultOpenButton = document.getElementById("defaultOpen");
+    if (defaultOpenButton) {
+        // Kita tidak perlu 'click()' karena HTML-nya sudah benar
+        // Biarkan state HTML awal yang menanganinya.
+    }
+});
 </script>
 @endpush
