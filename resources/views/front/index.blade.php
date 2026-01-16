@@ -32,7 +32,7 @@
             </div>
         </div>
         <section id="Services" class="flex flex-col gap-3 px-4">
-            <h1 class="font-semibold text-white">Layanan Perawatan Mobil Auto Berkah</h1>
+            <h1 class="font-semibold text-white">Layanan Perawatan Mobil</h1>
             <div class="grid grid-cols-3 gap-4">
 
                 @forelse ($services as $service)
